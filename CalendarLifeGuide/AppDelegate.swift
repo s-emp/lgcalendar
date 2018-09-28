@@ -34,7 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let elapsedTime = floor((currentTimestamp - lastTime) * 10_000) / 10
         let total = currentTimestamp - firstTime
         if elapsedTime > 16.7 {
-            print("⚠️ Frame was dropped with elapsed time of \(elapsedTime) at \(total)")
+            print("⚠️ Время отрисовки кадра \(elapsedTime). FPS: \(1000 / elapsedTime)")
         }
         lastTime = link.timestamp
     }

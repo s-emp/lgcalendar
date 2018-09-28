@@ -9,10 +9,16 @@
 import UIKit
 
 private let identifier = "Cell"
+private let dayInSecond = 86_400
 
 class LGCalendarView: UICollectionView {
     private var currentCellWidth = 0
     private var currentInsetForSections: CGFloat = 0.0
+    
+    var startDate = Date(timeIntervalSince1970: 1262304000.0)
+    var endDate = Date()
+    
+    var data: [Date?] = []
 
     override init(frame: CGRect, collectionViewLayout layout: UICollectionViewLayout) {
         super.init(frame: frame, collectionViewLayout: layout)
@@ -31,6 +37,11 @@ class LGCalendarView: UICollectionView {
     private func prepare() {
         delegate = self
         dataSource = self
+        let count = Int(endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / dayInSecond
+        data = Array(repeating: nil, count: count)
+        for i in 0..<count {
+            data[i] = Date(timeIntervalSince1970: startDate.timeIntervalSince1970 + Double(dayInSecond * i))
+        }
         register(UINib(nibName: "LGCalendarDayCell", bundle: nil), forCellWithReuseIdentifier: identifier)
     }
     
@@ -67,11 +78,13 @@ extension LGCalendarView: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets.init(top: 0.0, left: currentInsetForSections, bottom: 0.0, right: currentInsetForSections)
     }
+    
+
 }
 
 extension LGCalendarView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1000
+        return data.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
