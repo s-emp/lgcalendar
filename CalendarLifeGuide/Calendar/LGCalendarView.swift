@@ -9,11 +9,12 @@
 import UIKit
 
 private let identifier = "Cell"
-private let dayInSecond = 86_400
+private let secondsInDay = 86_400
 
 class LGCalendarView: UICollectionView {
     private var currentCellWidth = 0
     private var currentInsetForSections: CGFloat = 0.0
+    private let calendar = Calendar.current
     
     var startDate = Date(timeIntervalSince1970: 1262304000.0)
     var endDate = Date()
@@ -37,12 +38,15 @@ class LGCalendarView: UICollectionView {
     private func prepare() {
         delegate = self
         dataSource = self
-        let count = Int(endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / dayInSecond
+        let tmpStart = DispatchTime.now()
+        let count = Int(endDate.timeIntervalSince1970 - startDate.timeIntervalSince1970) / secondsInDay
         data = Array(repeating: nil, count: count)
         for i in 0..<count {
-            data[i] = Date(timeIntervalSince1970: startDate.timeIntervalSince1970 + Double(dayInSecond * i))
+            data[i] = Date(timeIntervalSince1970: startDate.timeIntervalSince1970 + Double(secondsInDay * i))
         }
+        print("Время создания дат: \((DispatchTime.now().uptimeNanoseconds - tmpStart.uptimeNanoseconds) ) сек")
         register(UINib(nibName: "LGCalendarDayCell", bundle: nil), forCellWithReuseIdentifier: identifier)
+        
     }
     
     func prepareUI() {
@@ -93,17 +97,19 @@ extension LGCalendarView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let dayCell = cell as? LGCalendarDayCell else { return }
+        guard let date = data[indexPath.row] else { return }
+        let strDay = String(calendar.component(.day, from: date))
         let tmp = arc4random_uniform(5)
         if tmp == 0 {
-            dayCell.prepare(String(indexPath.row), type: .holiday(countEvent: Int(arc4random_uniform(3))))
+            dayCell.prepare(strDay, type: .holiday(countEvent: Int(arc4random_uniform(3))))
         } else if tmp == 1 {
-            dayCell.prepare(String(indexPath.row), type: .workday(countEvent: Int(arc4random_uniform(3))))
+            dayCell.prepare(strDay, type: .workday(countEvent: Int(arc4random_uniform(3))))
         } else if tmp == 2 {
-            dayCell.prepare(String(indexPath.row), type: .notFound(countEvent: Int(arc4random_uniform(3))))
+            dayCell.prepare(strDay, type: .notFound(countEvent: Int(arc4random_uniform(3))))
         } else if tmp == 3 {
-            dayCell.prepare(String(indexPath.row), type: .clear)
+            dayCell.prepare(strDay, type: .clear)
         } else if tmp == 4 {
-            dayCell.prepare(String(indexPath.row), type: .selected(type: .workday(countEvent: Int(arc4random_uniform(3)))))
+            dayCell.prepare(strDay, type: .selected(type: .workday(countEvent: Int(arc4random_uniform(3)))))
         } else {
             print("Typnul %(")
         }

@@ -32,7 +32,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         let currentTimestamp = link.timestamp
         let elapsedTime = floor((currentTimestamp - lastTime) * 10_000) / 10
-        let total = currentTimestamp - firstTime
         if elapsedTime > 16.7 {
             print("⚠️ Время отрисовки кадра \(elapsedTime). FPS: \(1000 / elapsedTime)")
         }

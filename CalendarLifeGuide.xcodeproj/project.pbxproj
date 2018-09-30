@@ -15,6 +15,7 @@
 		62D97DCB215E367D0073340D /* LGCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D97DCA215E367D0073340D /* LGCalendarView.swift */; };
 		62D97DCE215E40F00073340D /* LGCalendarDayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D97DCC215E40F00073340D /* LGCalendarDayCell.swift */; };
 		62D97DCF215E40F00073340D /* LGCalendarDayCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 62D97DCD215E40F00073340D /* LGCalendarDayCell.xib */; };
+		B900E0F1216133AB00B09286 /* LGCalendarDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B900E0F0216133AB00B09286 /* LGCalendarDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		62D97DCA215E367D0073340D /* LGCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LGCalendarView.swift; sourceTree = "<group>"; };
 		62D97DCC215E40F00073340D /* LGCalendarDayCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LGCalendarDayCell.swift; sourceTree = "<group>"; };
 		62D97DCD215E40F00073340D /* LGCalendarDayCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LGCalendarDayCell.xib; sourceTree = "<group>"; };
+		B900E0F0216133AB00B09286 /* LGCalendarDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LGCalendarDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +79,7 @@
 				62D97DCA215E367D0073340D /* LGCalendarView.swift */,
 				62D97DCC215E40F00073340D /* LGCalendarDayCell.swift */,
 				62D97DCD215E40F00073340D /* LGCalendarDayCell.xib */,
+				B900E0F0216133AB00B09286 /* LGCalendarDelegate.swift */,
 			);
 			path = Calendar;
 			sourceTree = "<group>";
@@ -155,6 +158,7 @@
 			files = (
 				62D97DC8215E363B0073340D /* TestViewController.swift in Sources */,
 				62D97DCE215E40F00073340D /* LGCalendarDayCell.swift in Sources */,
+				B900E0F1216133AB00B09286 /* LGCalendarDelegate.swift in Sources */,
 				62D97DB2215E2C1F0073340D /* AppDelegate.swift in Sources */,
 				62D97DCB215E367D0073340D /* LGCalendarView.swift in Sources */,
 			);
