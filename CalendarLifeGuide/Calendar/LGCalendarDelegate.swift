@@ -8,9 +8,14 @@
 
 import Foundation
 
-protocol LGCalendarDelegate {
+protocol LGCalendarDelegate: AnyObject {
+    
+    /// Минимальная дата отображаемая в календаре. Она будет округлена до первого дня месяца, что бы корректно построить календарь.
     var startDate: Date { get }
+    
+    /// Максимальная дата отображаемая в календаре. Она будет округлена до последнего дня/часа/минуты/секунды месяца, что бы корректно построить календарь.
     var endDate: Date { get }
+    
     var events: [Date: Int] { get }
     var selectedDate: Date { get set }
     func selected(_ date: Date)

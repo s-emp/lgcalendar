@@ -43,13 +43,13 @@ class LGCalendarDayCell: UICollectionViewCell {
             mainView.isHidden = true
         case .notFound(let countEvent):
             prepareCountEvent(countEvent)
-            titleLabel.textColor = .orange
+            titleLabel.textColor = UIColor(red: 0.62745, green: 0.64314, blue: 0.73333, alpha: 1)
         case .holiday(let countEvent):
             prepareCountEvent(countEvent)
-            titleLabel.textColor = .blue
+            titleLabel.textColor = UIColor(red: 0.23529, green: 0.2549, blue: 0.38431, alpha: 1)
         case .workday(let countEvent):
             prepareCountEvent(countEvent)
-            titleLabel.textColor = .black
+            titleLabel.textColor = UIColor(red: 0.466666666, green: 0.490196078, blue: 0.631372549, alpha: 1)
         case .selected(let typeCell):
             selectedView.isHidden = false
             switch typeCell {

@@ -14,7 +14,7 @@ class TestViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        calendarView.delegateLGCalendar = self
         // Do any additional setup after loading the view.
     }
     
@@ -34,4 +34,44 @@ class TestViewController: UIViewController {
     }
     */
 
+}
+
+extension TestViewController: LGCalendarDelegate {
+    var startDate: Date {
+        var tmp = DateComponents()
+        tmp.timeZone = TimeZone.current
+        tmp.year = 2010
+        tmp.month = 1
+        tmp.day = 2
+        tmp.hour = 3
+        
+        return Calendar.current.date(from: tmp)!
+    }
+    
+    var endDate: Date {
+        return Date(timeIntervalSince1970: 1262386123.0).addingTimeInterval(86_400 * 9100)
+    }
+    
+    var events: [Date : Int] {
+        return [Date(timeIntervalSince1970: 1538409024):2, Date(timeIntervalSince1970: 1538109024): 3]
+    }
+    
+    var selectedDate: Date {
+        get {
+            return Date()
+        }
+        set {
+            ()
+        }
+    }
+    
+    func selected(_ date: Date) {
+        ()
+    }
+    
+    func closeCalendar() {
+        ()
+    }
+    
+    
 }
