@@ -52,8 +52,8 @@ extension TestViewController: LGCalendarDelegate {
         return Date(timeIntervalSince1970: 1262386123.0).addingTimeInterval(86_400 * 9100)
     }
     
-    var events: [Date : Int] {
-        return [Date(timeIntervalSince1970: 1538409024):2, Date(timeIntervalSince1970: 1538109024): 3]
+    var events: [Date] {
+        return Array(repeating: Date(), count: 10_000)
     }
     
     var selectedDate: Date {
