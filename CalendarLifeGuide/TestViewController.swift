@@ -49,11 +49,11 @@ extension TestViewController: LGCalendarDelegate {
     }
     
     var endDate: Date {
-        return Date(timeIntervalSince1970: 1262386123.0).addingTimeInterval(86_400 * 9100)
+        return Date(timeIntervalSince1970: 1262386123.0).addingTimeInterval(86_400 * 1200)
     }
     
     var events: [Date] {
-        return Array(repeating: Date(), count: 10_000)
+        return []
     }
     
     var selectedDate: Date {

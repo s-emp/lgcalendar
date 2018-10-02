@@ -16,19 +16,20 @@ class LGCalendarView: UICollectionView {
     
     private var currentCellWidth = 0
     private var currentInsetForSections: CGFloat = 0.0
+    private var calendar = Calendar.current
     private let dateFormatter = DateFormatter()
-    private var data: [[(Date?, Int)]?] = []
+    private var data: [[(date: Date?, countEvents: Int)]?] = []
     private var startDate: Date?
     private var endDate: Date?
     
     weak var delegateLGCalendar: LGCalendarDelegate? {
         didSet {
             guard let newValue = delegateLGCalendar else { return }
-            var comp = Calendar.current.dateComponents([.year, .month], from: newValue.startDate)
+            var comp = calendar.dateComponents([.year, .month], from: newValue.startDate)
             comp.timeZone = TimeZone(abbreviation: "UTC")!
-            startDate = Calendar.current.date(from: comp)
-            comp = Calendar.current.dateComponents([.year, .month], from: newValue.endDate)
-            endDate = Calendar.current.date(from: comp)
+            startDate = calendar.date(from: comp)
+            comp = calendar.dateComponents([.year, .month], from: newValue.endDate)
+            endDate = calendar.date(from: comp)
         }
     }
 
@@ -54,6 +55,7 @@ class LGCalendarView: UICollectionView {
     private func prepare() {
         dateFormatter.dateFormat = "MMMM"
         dateFormatter.timeZone = TimeZone(abbreviation: "UTC")!
+        calendar.timeZone = TimeZone(abbreviation: "UTC")!
         delegate = self
         dataSource = self
         register(UINib(nibName: "LGCalendarDayCell", bundle: nil), forCellWithReuseIdentifier: identifier)
@@ -63,29 +65,34 @@ class LGCalendarView: UICollectionView {
     private func prepareData() {
         let tmpStart = DispatchTime.now()
         guard let startDate = startDate, let endDate = endDate else { return }
-        guard let delegate = delegateLGCalendar else { return }
-        let startMonth = Calendar.current.component(.month, from: startDate)
-        let startYear = Calendar.current.component(.year, from: startDate)
-        let endMonth = Calendar.current.component(.month, from: endDate)
-        let endYear = Calendar.current.component(.year, from: endDate)
-        let countSection = (endYear - startYear - 1) * 12 + endMonth + 12 - startMonth
-        data = Array(repeating: nil, count: countSection)
+        let startMonth = calendar.component(.month, from: startDate)
+        let startYear = calendar.component(.year, from: startDate)
+        let endMonth = calendar.component(.month, from: endDate)
+        let endYear = calendar.component(.year, from: endDate)
+        let monthsPerYear = 12
+        prepareSectionsAndRow((endYear - startYear - 1) * monthsPerYear + endMonth + monthsPerYear - startMonth)
+        print("Время создания дат: \((DispatchTime.now().uptimeNanoseconds - tmpStart.uptimeNanoseconds) ) наносек")
+    }
+    
+    private func prepareSectionsAndRow(_ countMonths: Int) {
+        guard let startDate = startDate, let delegate = delegateLGCalendar else { return }
         let sortedEvents = delegate.events.sorted(by: { return $0 < $1 })
         var currentEventDate = 0
-        for i in 0..<countSection {
-            guard let newDate = Calendar.current.date(byAdding: .month, value: i, to: startDate) else { fatalError("Неполучилось добавить \(i) месяцов к дате \(startDate)") }
-            let additionDays = Calendar.current.component(.weekday, from: newDate) - 2
-            let countDayInMonth = (Calendar.current.range(of: .day, in: .month, for: newDate)?.count ?? 0) + additionDays
-            data[i] = Array(repeating: (nil, 0), count: countDayInMonth)
-            for j in 0..<countDayInMonth where j >= additionDays {
-                data[i]![j].0 = Date(timeIntervalSince1970: newDate.timeIntervalSince1970 + Double(secondsInDay * (j - additionDays)))
+        data = Array(repeating: nil, count: countMonths)
+        for month in 0..<countMonths {
+            guard let newDate = calendar.date(byAdding: .month, value: month, to: startDate) else { fatalError("Неполучилось добавить \(month) месяцов к дате \(startDate)") }
+            let additionDays = calendar.component(.weekday, from: newDate) - 2
+            let countDayInMonth = (calendar.range(of: .day, in: .month, for: newDate)?.count ?? 0) + additionDays
+            data[month] = Array(repeating: (nil, 0), count: countDayInMonth)
+            for day in 0..<countDayInMonth where day >= additionDays {
+                data[month]![day].date = Date(timeIntervalSince1970: newDate.timeIntervalSince1970 + Double(secondsInDay * (day - additionDays)))
                 if sortedEvents.count > 0 {
                     while currentEventDate < sortedEvents.count {
-                        if sortedEvents[currentEventDate] < data[i]![j].0! {
-                            if j > 0 {
-                                data[i]![j - 1].1 += 1
+                        if sortedEvents[currentEventDate] < data[month]![day].date! {
+                            if day > 0 {
+                                data[month]![day - 1].countEvents += 1
                             } else {
-                                data[i-1]![data[i - 1]!.count - 1].1 += 1
+                                data[month-1]![data[month - 1]!.count - 1].countEvents += 1
                             }
                             currentEventDate += 1
                         } else {
@@ -95,7 +102,6 @@ class LGCalendarView: UICollectionView {
                 }
             }
         }
-        print("Время создания дат: \((DispatchTime.now().uptimeNanoseconds - tmpStart.uptimeNanoseconds) ) наносек")
     }
     
     func prepareUI() {
@@ -125,7 +131,7 @@ extension LGCalendarView: UICollectionViewDelegateFlowLayout {
         guard let tmpDate = data[indexPath.section]?.first(where: { return $0.0 != nil }) else { fatalError() }
         guard let date = tmpDate.0 else { fatalError() }
         
-        view.title = dateFormatter.string(from: date) + " " + String(Calendar.current.component(.year, from: date))
+        view.title = dateFormatter.string(from: date) + " " + String(calendar.component(.year, from: date))
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
@@ -168,7 +174,7 @@ extension LGCalendarView: UICollectionViewDataSource {
         guard let delegate = delegateLGCalendar else { return }
         if let date = data[indexPath.section]?[indexPath.row].0 {
             let countEvent = data[indexPath.section]![indexPath.row].1
-            let strDay = String(Calendar.current.component(.day, from: date))
+            let strDay = String(calendar.component(.day, from: date))
             if date < delegate.startDate {
                 dayCell.prepare(strDay, type: .notFound(countEvent: countEvent))
                 return
@@ -177,7 +183,7 @@ extension LGCalendarView: UICollectionViewDataSource {
                 dayCell.prepare(strDay, type: .notFound(countEvent: countEvent))
                 return
             }
-            let weekDay = Calendar.current.component(.weekday, from: date) - 1
+            let weekDay = calendar.component(.weekday, from: date) - 1
             if weekDay == 6 || weekDay == 0 {
                 dayCell.prepare(strDay, type: .holiday(countEvent: countEvent))
             } else {
