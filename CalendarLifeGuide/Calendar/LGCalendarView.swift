@@ -18,7 +18,7 @@ class LGCalendarView: UICollectionView {
     private var currentInsetForSections: CGFloat = 0.0
     private var calendar = Calendar.current
     private let dateFormatter = DateFormatter()
-    private var data: [[(date: Date?, countEvents: Int)]?] = []
+    private var data: [[(date: Date?, type: LGCalendarTypeCell)]?] = []
     private var startDate: Date?
     private var endDate: Date?
     
@@ -29,7 +29,7 @@ class LGCalendarView: UICollectionView {
             comp.timeZone = TimeZone(abbreviation: "UTC")!
             startDate = calendar.date(from: comp)
             comp = calendar.dateComponents([.year, .month], from: newValue.endDate)
-            endDate = calendar.date(from: comp)
+            endDate = calendar.date(byAdding: .month, value: 1, to: calendar.date(from: comp)!)
         }
     }
 
@@ -81,34 +81,76 @@ class LGCalendarView: UICollectionView {
         data = Array(repeating: nil, count: countMonths)
         for month in 0..<countMonths {
             guard let newDate = calendar.date(byAdding: .month, value: month, to: startDate) else { fatalError("Неполучилось добавить \(month) месяцов к дате \(startDate)") }
-            var additionDays = calendar.component(.weekday, from: newDate) - 2
-            additionDays = additionDays >= 0 ? additionDays : 7 + additionDays
+            let additionDays = getAdditionalDays(newDate)
             let countDayInMonth = (calendar.range(of: .day, in: .month, for: newDate)?.count ?? 0) + additionDays
-            data[month] = Array(repeating: (nil, 0), count: countDayInMonth)
+            data[month] = Array(repeating: (nil, .clear), count: countDayInMonth)
             for day in 0..<countDayInMonth where day >= additionDays {
+                // Укажем дату
                 data[month]![day].date = Date(timeIntervalSince1970: newDate.timeIntervalSince1970 + Double(secondsInDay * (day - additionDays)))
+                // Подсчитаем количество событий
+                var countEvents = 0
                 if sortedEvents.count > 0 {
                     while currentEventDate < sortedEvents.count {
-                        if sortedEvents[currentEventDate] < data[month]![day].date! {
-                            if day > 0 {
-                                data[month]![day - 1].countEvents += 1
-                            } else {
-                                data[month-1]![data[month - 1]!.count - 1].countEvents += 1
-                            }
+                        let currentDay = calendar.date(byAdding: .day, value: 1, to: data[month]![day].date!)!
+                        if sortedEvents[currentEventDate] < currentDay {
+                            countEvents += 1
                             currentEventDate += 1
                         } else {
                             break
                         }
                     }
                 }
+                // Определим тип ячейки
+                if data[month]![day].date! < delegate.startDate || data[month]![day].date! > delegate.endDate {
+                    data[month]![day].type = .notFound(countEvent: countEvents)
+                    continue
+                }
+                let weekDay = calendar.component(.weekday, from: data[month]![day].date!) - 1
+                if weekDay == 6 || weekDay == 0 {
+                    data[month]![day].type = .holiday(countEvent: countEvents)
+                } else {
+                    data[month]![day].type = .workday(countEvent: countEvents)
+                }
             }
         }
+    }
+    
+    private func getAdditionalDays(_ date: Date) -> Int {
+        let additionalDays = calendar.component(.weekday, from: date) - 2
+        return additionalDays >= 0 ? additionalDays : 7 + additionalDays
     }
     
     func prepareUI() {
         updateCurrentCellWidth()
         updateCurrentInset()
         reloadData()
+    }
+    
+    func scrollToDate(_ date: Date, animated: Bool) {
+        guard let startDate = startDate, let endDate = endDate else { return }
+        guard date >= startDate && date < endDate else { return }
+        self.scrollToItem(at: getSection(at: date), at: .top, animated: animated)
+    }
+    
+    private func getSection(at date: Date) -> IndexPath {
+        var lowerIndex = 0
+        var upperIndex = data.count - 1
+        guard lowerIndex <= upperIndex else { return IndexPath(row: 0, section: 0) }
+        
+        while true {
+            let currentIndex = (lowerIndex + upperIndex) / 2
+            if let firstDateInMonth = data[currentIndex]?.first(where: { return $0.date != nil })?.date {
+                if firstDateInMonth <= date && calendar.date(byAdding: .month, value: 1, to: firstDateInMonth)! > date {
+                    return IndexPath(row: 0, section: currentIndex)
+                } else if firstDateInMonth > date {
+                    upperIndex = currentIndex - 1
+                } else {
+                    lowerIndex = currentIndex + 1
+                }
+            } else {
+                return IndexPath(row: 0, section: 0)
+            }
+        }
     }
     
     private func updateCurrentInset() {
@@ -172,24 +214,9 @@ extension LGCalendarView: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         guard let dayCell = cell as? LGCalendarDayCell else { return }
-        guard let delegate = delegateLGCalendar else { return }
-        if let date = data[indexPath.section]?[indexPath.row].0 {
-            let countEvent = data[indexPath.section]![indexPath.row].1
+        if let item = data[indexPath.section]?[indexPath.row], let date = item.date {
             let strDay = String(calendar.component(.day, from: date))
-            if date < delegate.startDate {
-                dayCell.prepare(strDay, type: .notFound(countEvent: countEvent))
-                return
-            }
-            if date > delegate.endDate {
-                dayCell.prepare(strDay, type: .notFound(countEvent: countEvent))
-                return
-            }
-            let weekDay = calendar.component(.weekday, from: date) - 1
-            if weekDay == 6 || weekDay == 0 {
-                dayCell.prepare(strDay, type: .holiday(countEvent: countEvent))
-            } else {
-                dayCell.prepare(strDay, type: .workday(countEvent: countEvent))
-            }
+            dayCell.prepare(strDay, type: item.type)
         } else {
             dayCell.prepare("", type: .clear)
         }

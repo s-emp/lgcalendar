@@ -23,7 +23,12 @@ class TestViewController: UIViewController {
         super.viewDidAppear(animated)
     }
     
-
+    @IBAction func touchScrollToDate(_ sender: Any) {
+        let date = Date(timeIntervalSince1970: 1275386123.0)
+        print("Scroll to: \(date)")
+        calendarView.scrollToDate(date, animated: true)
+    }
+    
     /*
     // MARK: - Navigation
 
@@ -49,7 +54,7 @@ extension TestViewController: LGCalendarDelegate {
     }
     
     var endDate: Date {
-        return Date(timeIntervalSince1970: 1262386123.0).addingTimeInterval(86_400 * 1200)
+        return Date(timeIntervalSince1970: 1538495424)
     }
     
     var events: [Date] {

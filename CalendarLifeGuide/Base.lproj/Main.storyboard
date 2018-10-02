@@ -29,12 +29,22 @@
                                 </collectionViewFlowLayout>
                                 <cells/>
                             </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="e7I-lm-YT7">
+                                <rect key="frame" x="10" y="20" width="355" height="30"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="touchScrollToDate:" destination="BYZ-38-t0r" eventType="touchUpInside" id="g3r-KS-LzV"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="e7I-lm-YT7" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="3CO-ma-466"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="6Rr-fz-vL1" secondAttribute="trailing" constant="20" id="49u-Fm-xYl"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="6Rr-fz-vL1" secondAttribute="bottom" constant="20" id="C2q-lu-hhM"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="e7I-lm-YT7" secondAttribute="trailing" constant="10" id="CKY-sL-Xxc"/>
                             <constraint firstItem="6Rr-fz-vL1" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="L0b-6n-2HR"/>
+                            <constraint firstItem="e7I-lm-YT7" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="Td4-g2-Mc2"/>
                             <constraint firstItem="6Rr-fz-vL1" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="hNk-h9-yDs"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>

@@ -16,8 +16,8 @@ protocol LGCalendarDelegate: AnyObject {
     /// Максимальная дата отображаемая в календаре. Она будет округлена до последнего дня/часа/минуты/секунды месяца, что бы корректно построить календарь.
     var endDate: Date { get }
     
+    /// Список событий. 
     var events: [Date] { get }
     var selectedDate: Date { get set }
-    func selected(_ date: Date)
     func closeCalendar()
 }
