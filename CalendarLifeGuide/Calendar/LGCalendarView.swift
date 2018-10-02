@@ -111,6 +111,10 @@ class LGCalendarView: UICollectionView {
                 } else {
                     data[month]![day].type = .workday(countEvent: countEvents)
                 }
+                // Если дата выбрана, поменяем тип ячейки на выбранную
+                if data[month]![day].date! <= delegate.selectedDate && calendar.date(byAdding: .day, value: 1, to: data[month]![day].date!)! > delegate.selectedDate {
+                    data[month]![day].type = .selected(type: data[month]![day].type)
+                }
             }
         }
     }

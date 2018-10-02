@@ -50,20 +50,20 @@ extension TestViewController: LGCalendarDelegate {
         tmp.day = 2
         tmp.hour = 3
         
-        return Calendar.current.date(from: tmp)!
+        return Date(timeIntervalSince1970: 1538352720)
     }
     
     var endDate: Date {
-        return Date(timeIntervalSince1970: 1538495424)
+        return Date(timeIntervalSince1970: 1549036224)
     }
     
     var events: [Date] {
-        return []
+        return [Date(timeIntervalSince1970: 1538697600), Date(timeIntervalSince1970: 1538784000), Date(timeIntervalSince1970: 1538784600), Date(timeIntervalSince1970: 1538957400), Date(timeIntervalSince1970: 1538957520), Date(timeIntervalSince1970: 1538957540)]
     }
     
     var selectedDate: Date {
         get {
-            return Date()
+            return Date(timeIntervalSince1970: 1538957540)
         }
         set {
             ()
