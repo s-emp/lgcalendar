@@ -81,7 +81,8 @@ class LGCalendarView: UICollectionView {
         data = Array(repeating: nil, count: countMonths)
         for month in 0..<countMonths {
             guard let newDate = calendar.date(byAdding: .month, value: month, to: startDate) else { fatalError("Неполучилось добавить \(month) месяцов к дате \(startDate)") }
-            let additionDays = calendar.component(.weekday, from: newDate) - 2
+            var additionDays = calendar.component(.weekday, from: newDate) - 2
+            additionDays = additionDays >= 0 ? additionDays : 7 + additionDays
             let countDayInMonth = (calendar.range(of: .day, in: .month, for: newDate)?.count ?? 0) + additionDays
             data[month] = Array(repeating: (nil, 0), count: countDayInMonth)
             for day in 0..<countDayInMonth where day >= additionDays {
